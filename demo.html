@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>syntax-json — Demo</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet" crossorigin="anonymous">
+<script>
+// Auto theme detection (before body to prevent FOUC)
+(function(){
+  var d = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-bs-theme', d);
+})();
+</script>
+<style>
+  .metric-value { font-size: 2.25rem; font-weight: 700; line-height: 1.1; }
+  .metric-unit { font-size: .875rem; font-weight: 400; }
+  .metric-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; opacity: .65; margin-top: .25rem; }
+  pre code.json { font-size: .85rem; }
+  .bench-row td { vertical-align: middle; }
+  .bench-bar { height: 6px; border-radius: 3px; background: var(--bs-primary); transition: width .4s ease; }
+  .bench-bar-bg { height: 6px; border-radius: 3px; background: var(--bs-border-color); width: 100%; }
+  .icon-circle { width: 2.5rem; height: 2.5rem; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar border-bottom">
+  <div class="container">
+    <span class="navbar-brand fw-bold mb-0"><i class="bi bi-braces"></i> syntax-json</span>
+    <div class="d-flex align-items-center gap-2">
+      <div class="btn-group btn-group-sm" role="group" aria-label="Theme">
+        <button class="btn btn-outline-secondary" onclick="setTheme('light')" title="Light"><i class="bi bi-sun-fill"></i></button>
+        <button class="btn btn-outline-secondary" onclick="setTheme('dark')" title="Dark"><i class="bi bi-moon-fill"></i></button>
+        <button class="btn btn-outline-secondary active" onclick="setTheme('auto')" title="Auto"><i class="bi bi-circle-half"></i></button>
+      </div>
+      <a href="https://github.com/anvme/syntax-json" class="btn btn-sm btn-outline-secondary" target="_blank"><i class="bi bi-github"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h1 class="display-6 fw-bold">syntax-json</h1>
+    <p class="lead text-body-secondary mb-1">Minimal JSON syntax highlighter. Single-pass, zero dependencies, &lt;1 KB.</p>
+    <p class="text-body-tertiary small">Uses the native CSS Highlight API — no DOM mutations, no reflows.</p>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="card text-center h-100 border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="icon-circle bg-primary-subtle text-primary mx-auto mb-2"><i class="bi bi-file-earmark-code"></i></div>
+          <div class="metric-value text-primary">&lt;1<span class="metric-unit">KB</span></div>
+          <div class="metric-label">Minified size</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card text-center h-100 border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="icon-circle bg-success-subtle text-success mx-auto mb-2"><i class="bi bi-box-seam"></i></div>
+          <div class="metric-value text-success">0</div>
+          <div class="metric-label">Dependencies</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card text-center h-100 border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="icon-circle bg-warning-subtle text-warning mx-auto mb-2"><i class="bi bi-layers"></i></div>
+          <div class="metric-value text-warning">0</div>
+          <div class="metric-label">DOM mutations</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card text-center h-100 border-0 shadow-sm">
+        <div class="card-body py-3">
+          <div class="icon-circle bg-info-subtle text-info mx-auto mb-2"><i class="bi bi-lightning-charge-fill"></i></div>
+          <div class="metric-value text-info" id="liveParseTime">&mdash;</div>
+          <div class="metric-label">Parse time</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Demo -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-code-slash"></i> Live Demo</span>
+      <span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle"></i> Highlighted</span>
+    </div>
+    <div class="card-body p-0">
+      <pre class="m-0 p-3" id="demoPre"><code class="json">{
+  "name": "syntax-json",
+  "version": "1.0.0",
+  "description": "Minimal JSON syntax highlighter",
+  "count": 42,
+  "pi": 3.14159265,
+  "scientific": 1.5e10,
+  "negative": -273.15,
+  "active": true,
+  "deleted": false,
+  "data": null,
+  "tags": ["fast", "light", "zero-deps", "css-highlight-api"],
+  "nested": {
+    "level": 2,
+    "items": [1, 2, 3],
+    "deep": { "ok": true }
+  }
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- Benchmark -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-speedometer2"></i> Performance Benchmark</span>
+      <button class="btn btn-sm btn-primary" onclick="runBench()" id="benchBtn">
+        <i class="bi bi-play-fill"></i> Run
+      </button>
+    </div>
+    <div class="card-body">
+      <p class="text-body-secondary small mb-3">Measures real parse time across different JSON sizes. Each size runs 50 iterations (median reported).</p>
+      <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0" id="benchTable">
+          <thead>
+            <tr class="text-body-secondary small">
+              <th style="width:100px">Size</th>
+              <th style="width:100px">Time</th>
+              <th style="width:120px">Throughput</th>
+              <th>Scale</th>
+            </tr>
+          </thead>
+          <tbody id="benchBody">
+            <tr><td colspan="4" class="text-center text-body-tertiary py-3"><i class="bi bi-arrow-up-circle"></i> Click <strong>Run</strong> to benchmark</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Install -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent"><i class="bi bi-download"></i> Install</div>
+    <div class="card-body">
+      <h6 class="fw-semibold">CDN <span class="badge bg-body-secondary text-body-secondary fw-normal">recommended</span></h6>
+      <pre class="bg-body-tertiary p-3 rounded small mb-3"><code>&lt;script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.0/dist/syntaxjson.min.js" crossorigin="anonymous"&gt;&lt;/script&gt;</code></pre>
+      <h6 class="fw-semibold">npm</h6>
+      <pre class="bg-body-tertiary p-3 rounded small mb-3"><code>npm install syntax-json</code></pre>
+      <h6 class="fw-semibold">ESM</h6>
+      <pre class="bg-body-tertiary p-3 rounded small mb-0"><code>import syntaxJSON from 'syntax-json';</code></pre>
+    </div>
+  </div>
+
+  <!-- Usage -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-transparent"><i class="bi bi-book"></i> Usage</div>
+    <div class="card-body">
+      <p class="text-body-secondary small">Add the script and use <code>&lt;pre&gt;&lt;code class="json"&gt;</code> — highlighting is automatic.</p>
+      <pre class="bg-body-tertiary p-3 rounded small mb-0"><code>&lt;pre&gt;&lt;code class="json"&gt;{ "hello": "world", "n": 42, "ok": true }&lt;/code&gt;&lt;/pre&gt;
+
+&lt;script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.0/dist/syntaxjson.min.js" crossorigin="anonymous"&gt;&lt;/script&gt;</code></pre>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="text-center text-body-tertiary small py-3">
+    <a href="https://github.com/anvme/syntax-json" class="text-body-secondary text-decoration-none">syntax-json</a> · MIT License
+  </div>
+
+</div>
+
+<!-- Load syntax-json from jsDelivr CDN (fallback to local dist) -->
+<script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.0/dist/syntaxjson.min.js"
+        crossorigin="anonymous" onerror="this.onerror=null;this.src='dist/syntaxjson.min.js'"></script>
+
+<script>
+// --- Theme switching ---
+function setTheme(t) {
+  var btns = document.querySelectorAll('[aria-label=Theme] .btn');
+  btns.forEach(function(b){ b.classList.remove('active') });
+  if (t === 'auto') {
+    localStorage.removeItem('sj-theme');
+    t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    btns[2].classList.add('active');
+  } else {
+    localStorage.setItem('sj-theme', t);
+    btns[t === 'light' ? 0 : 1].classList.add('active');
+  }
+  document.documentElement.setAttribute('data-bs-theme', t);
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+  if (!localStorage.getItem('sj-theme')) setTheme('auto');
+});
+
+// --- Measure initial parse time ---
+(function() {
+  var el = document.querySelector('#demoPre code.json');
+  if (!el || typeof syntaxJSON === 'undefined') return;
+  // Re-run parse to measure (first run already happened via auto-init)
+  el.textContent = el.textContent; // reset text node
+  var t0 = performance.now();
+  syntaxJSON(el);
+  var dt = performance.now() - t0;
+  var out = dt < 0.1 ? '<0.1<span class="metric-unit">ms</span>' : dt.toFixed(2) + '<span class="metric-unit">ms</span>';
+  document.getElementById('liveParseTime').innerHTML = out;
+  // Re-register highlights
+  var R = syntaxJSON(el);
+  for (var k in R) if (R[k].length) CSS.highlights.set('sj-' + k, new Highlight(...R[k]));
+})();
+
+// --- Benchmark ---
+function generateJSON(targetBytes) {
+  var items = [], size = 2, i = 0;
+  while (size < targetBytes) {
+    var obj = '{"id":' + i + ',"name":"item-' + i + '","value":' + (Math.random() * 1000).toFixed(4) + ',"active":' + (i % 2 === 0) + ',"data":null}';
+    items.push(obj);
+    size += obj.length + 2;
+    i++;
+  }
+  return '[\n' + items.join(',\n') + '\n]';
+}
+
+function runBench() {
+  var btn = document.getElementById('benchBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Running…';
+
+  setTimeout(function() {
+    var sizes = [
+      { label: '1 KB', bytes: 1024 },
+      { label: '10 KB', bytes: 10240 },
+      { label: '100 KB', bytes: 102400 },
+      { label: '500 KB', bytes: 512000 }
+    ];
+    var results = [];
+    var maxTime = 0;
+
+    sizes.forEach(function(s) {
+      var json = generateJSON(s.bytes);
+      var pre = document.createElement('pre');
+      var code = document.createElement('code');
+      code.className = 'json';
+      pre.appendChild(code);
+      pre.style.cssText = 'position:absolute;left:-9999px;visibility:hidden';
+      document.body.appendChild(pre);
+
+      // Warm up
+      code.textContent = json;
+      syntaxJSON(code);
+
+      // Measure 50 iterations
+      var times = [], iter = 50;
+      for (var i = 0; i < iter; i++) {
+        code.textContent = json;
+        var t0 = performance.now();
+        syntaxJSON(code);
+        times.push(performance.now() - t0);
+      }
+      document.body.removeChild(pre);
+
+      times.sort(function(a, b) { return a - b; });
+      var median = times[Math.floor(times.length / 2)];
+      var throughput = (json.length / 1024 / 1024) / (median / 1000); // MB/s
+      if (median > maxTime) maxTime = median;
+
+      results.push({ label: s.label, median: median, throughput: throughput, chars: json.length });
+    });
+
+    // Render results
+    var tbody = document.getElementById('benchBody');
+    tbody.innerHTML = '';
+    results.forEach(function(r) {
+      var pct = Math.max(3, (r.median / maxTime) * 100);
+      var timeStr = r.median < 0.1 ? '<0.1 ms' : r.median.toFixed(2) + ' ms';
+      var tpStr = r.throughput > 1000 ? (r.throughput / 1000).toFixed(1) + ' GB/s' : r.throughput.toFixed(0) + ' MB/s';
+      var tr = document.createElement('tr');
+      tr.className = 'bench-row';
+      tr.innerHTML =
+        '<td class="fw-semibold">' + r.label + '</td>' +
+        '<td><code>' + timeStr + '</code></td>' +
+        '<td class="text-body-secondary small">' + tpStr + '</td>' +
+        '<td><div class="bench-bar-bg"><div class="bench-bar" style="width:' + pct + '%"></div></div></td>';
+      tbody.appendChild(tr);
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Re-run';
+  }, 50);
+}
+</script>
+
+</body>
+</html>

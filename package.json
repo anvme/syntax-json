@@ -1,0 +1,45 @@
+{
+  "name": "syntax-json",
+  "version": "1.0.0",
+  "description": "Minimal JSON syntax highlighter. Single-pass, zero dependencies, <1KB.",
+  "main": "dist/syntaxjson.min.js",
+  "module": "dist/syntaxjson.esm.js",
+  "unpkg": "dist/syntaxjson.min.js",
+  "jsdelivr": "dist/syntaxjson.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/syntaxjson.esm.js",
+      "require": "./dist/syntaxjson.min.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "json",
+    "syntax",
+    "highlight",
+    "highlighter",
+    "minimal",
+    "css-highlight-api",
+    "zero-dependency"
+  ],
+  "author": "anvme",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anvme/syntax-json"
+  },
+  "homepage": "https://github.com/anvme/syntax-json#readme",
+  "bugs": {
+    "url": "https://github.com/anvme/syntax-json/issues"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.3"
+  }
+}
