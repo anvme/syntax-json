@@ -1,6 +1,6 @@
 {
   "name": "syntax-json",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minimal JSON syntax highlighter. Single-pass, zero dependencies, <1KB.",
   "main": "dist/syntaxjson.min.js",
   "module": "dist/syntaxjson.esm.js",

@@ -24,7 +24,7 @@ import syntaxJSON from 'syntax-json';
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.0/dist/syntaxjson.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.1/dist/syntaxjson.min.js" crossorigin="anonymous"></script>
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ import syntaxJSON from 'syntax-json';
   "active": true
 }</code></pre>
 
-<script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.0/dist/syntaxjson.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/syntax-json@1.0.1/dist/syntaxjson.min.js" crossorigin="anonymous"></script>
 ```
 
 That's it. The script auto-highlights all `<pre><code class="json">` elements on page load.
